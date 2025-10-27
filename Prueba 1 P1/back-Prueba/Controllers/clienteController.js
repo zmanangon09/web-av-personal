@@ -3,16 +3,22 @@ import ClienteModel from "../Models/clienteModel.js";
 class ClienteController {
   // Crear cliente
   static crear(req, res) {
-    const { monto } = req.body;
+    const { nombre, monto } = req.body;
+    if (!nombre || nombre.trim() === "") {
+      return res.status(400).json({ mensaje: "El nombre es requerido." });
+    }
     if (monto == null || monto < 0) {
       return res.status(400).json({ mensaje: "El monto debe ser positivo." });
     }
-    const nuevo = ClienteModel.crear(monto);
+    const nuevo = ClienteModel.crear(nombre, monto);
     res.status(201).json({
       mensaje: "Cliente creado correctamente",
       cliente: {
         id: nuevo.id,
-        monto: nuevo.monto
+        nombre: nuevo.nombre,
+        monto: nuevo.monto,
+        porcentaje: (nuevo.porcentaje * 100) + '%',
+        cuota: nuevo.cuota.toFixed(2)
       }
     });
   }
@@ -29,7 +35,13 @@ class ClienteController {
     if (!cliente) {
       return res.status(404).json({ mensaje: "Cliente no encontrado" });
     }
-    res.json(cliente);
+    res.json({
+      id: cliente.id,
+      nombre: cliente.nombre,
+      monto: cliente.monto,
+      porcentaje: (cliente.porcentaje * 100) + '%',
+      cuota: cliente.cuota.toFixed(2)
+    });
   }
 
   // Actualizar
@@ -38,7 +50,16 @@ class ClienteController {
     if (!cliente) {
       return res.status(404).json({ mensaje: "Cliente no encontrado" });
     }
-    res.json({ mensaje: "Cliente actualizado", cliente });
+    res.json({ 
+      mensaje: "Cliente actualizado", 
+      cliente: {
+        id: cliente.id,
+        nombre: cliente.nombre,
+        monto: cliente.monto,
+        porcentaje: (cliente.porcentaje * 100) + '%',
+        cuota: cliente.cuota.toFixed(2)
+      }
+    });
   }
 
   // Eliminar

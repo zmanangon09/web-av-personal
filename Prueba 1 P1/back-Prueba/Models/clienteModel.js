@@ -1,26 +1,11 @@
 // Clase que representa un cliente con financiamiento
 class Cliente {
-  constructor(id, monto) {
+  constructor(id, nombre, monto) {
     this.id = id;
+    this.nombre = nombre;
     this.monto = monto;
-  }
-
-  // Calcula la cuota según el monto
-  calcularCuota() {
-    let porcentaje;
-    if (this.monto < 50000 & this.monto >=0) {
-      porcentaje = 0.03; // 3%
-    } else {
-      porcentaje = 0.02; // 2%
-    }
-    
-    const cuota = this.monto * porcentaje;
-
-    return {
-      monto: this.monto.toFixed(2),
-      porcentaje: (porcentaje * 100).toFixed(0) + '%',
-      cuota: cuota.toFixed(2)
-    };
+    this.porcentaje = this.monto < 50000 ? 0.03 : 0.02;
+    this.cuota = this.monto * this.porcentaje;
   }
 }
 
@@ -36,9 +21,9 @@ class ClienteModel {
     return this.clientes.find((c) => c.id === parseInt(id));
   }
 
-  static crear(monto) {
+  static crear(nombre, monto) {
     const id = this.clientes.length + 1;
-    const nuevo = new Cliente(id, monto);
+    const nuevo = new Cliente(id, nombre, monto);
     this.clientes.push(nuevo);
     return nuevo;
   }
@@ -46,7 +31,10 @@ class ClienteModel {
   static actualizar(id, datos) {
     const cliente = this.obtenerPorId(id);
     if (!cliente) return null;
+    cliente.nombre = datos.nombre ?? cliente.nombre;
     cliente.monto = datos.monto ?? cliente.monto;
+    cliente.porcentaje = cliente.monto < 50000 ? 0.03 : 0.02;
+    cliente.cuota = cliente.monto * cliente.porcentaje;
     return cliente;
   }
 
